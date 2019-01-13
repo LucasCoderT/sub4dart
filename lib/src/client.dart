@@ -1,30 +1,42 @@
-import 'package:http/http.dart' as http;
-import 'package:sub4dart/src/models/route.dart';
 import 'dart:convert' as convert;
+import 'dart:convert';
+
+import 'package:crypto/crypto.dart';
+import 'package:http/http.dart' as http;
+import 'package:password_hash/password_hash.dart';
+import 'package:sub4dart/src/models/route.dart'; // for the utf8.encode method
 
 class SubSonic {
-  final String clientID = "Sub4Dart 0.1";
-  final String baseRoute = "/rest";
-  Uri path;
-  String password, _salt;
-  http.Client client;
+  final String _clientID = "Sub4Dartv01";
+  final String _baseRoute = "/rest";
+  Map<String, dynamic> _baseParams;
+  Uri _path;
+  String _password;
+  http.Client _client;
 
-  SubSonic(String path, username, password) {
-    this.path = Uri.parse(path);
-    this.password = _encryptPassword(password);
-    this.client = http.Client();
-    this.path.replace(queryParameters: {
+  SubSonic(String path, username, this._password) {
+    if (!path.startsWith("http")) {
+      path = "http://$path";
+    }
+    this._path = Uri.parse(path);
+    this._client = http.Client();
+    this._baseParams = {
       "u": username,
-      "t": null,
-      "s": null,
       "v": "1.16.1",
-      "c": clientID,
+      "c": _clientID,
       "f": "json",
-    });
+    };
   }
 
-  String _encryptPassword(String rawPassword) {
-    
+  void changePassword(String newPassword) {
+    _password = newPassword;
+  }
+
+  Map<String, String> _encryptPassword() {
+    var salt = Salt.generateAsBase64String(6);
+    var bytes = utf8.encode(_password + salt); // data being hashed
+    var digest = md5.convert(bytes);
+    return {"t": digest.toString(), "s": salt};
   }
 
   Future<bool> isValid() async {
@@ -32,8 +44,18 @@ class SubSonic {
     return true;
   }
 
-  Future<Map<String, dynamic>> get(Route route) async {
-    http.Response response = await client.get(route.get(path));
+  Future<Map<String, dynamic>> _request(Route route) async {
+    Map<String, dynamic> payload = {};
+    payload.addAll(route.params);
+    payload.addAll(_baseParams);
+    payload.addAll(_encryptPassword());
+    var endpoint = Uri(
+        scheme: _path.scheme.isEmpty ? "http" : _path.scheme,
+        host: _path.host,
+        port: _path.port ?? "80",
+        path: "$_baseRoute${route.endpoint}",
+        queryParameters: payload);
+    http.Response response = await _client.get(endpoint);
     if (response.statusCode == 200) {
       return convert.jsonDecode(response.body);
     } else {
@@ -44,7 +66,7 @@ class SubSonic {
   Future<bool> getPing() async {
     var route = Route("/ping");
     try {
-      await get(route);
+      await _request(route);
       return true;
     } catch (e) {
       return false;
@@ -52,6 +74,6 @@ class SubSonic {
   }
 
   void dispose() {
-    client.close();
+    _client.close();
   }
 }
