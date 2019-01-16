@@ -10,8 +10,9 @@ A simple usage example:
 ```dart
 import 'package:sub4dart/sub4dart.dart';
 
-main() {
+main() async {
   var subsonic = new SubSonic("https://music.example.com","John","Doe");
+  await subsonic.getPing(); // Returns a response if successfully authenticated
 }
 ```
 
