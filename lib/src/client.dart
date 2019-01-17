@@ -11,12 +11,25 @@ import 'package:sub4dart/src/models/route.dart';
 import 'package:sub4dart/src/models/subsonic_response.dart'; // for the utf8.encode method
 
 class SubSonic {
+  /// Unique Client ID sent with every request.
   final String _clientID = "Sub4Dartv01";
+
+  /// The Base REST API route used.
   final String _baseRoute = "/rest";
+
+  /// General parameters sent with every request.
   Map<String, dynamic> _baseParams;
+
+  /// The url provided in the constructor.
   Uri _path;
+
+  /// The ClearText Password for authentication.
   String _password;
+
+  /// The Client used to make requests.
   http.Client _client;
+
+  /// Username of the subsonic user to authenticate with.
   String username;
 
   SubSonic(String path, username, this._password) {
@@ -34,6 +47,7 @@ class SubSonic {
     };
   }
 
+  /// Generates a salt and encrypts the password per subsonic rules for authenticating.
   Map<String, String> _encryptPassword() {
     var salt = Salt.generateAsBase64String(6);
     var bytes = utf8.encode(_password + salt); // data being hashed
@@ -41,6 +55,7 @@ class SubSonic {
     return {"t": digest.toString(), "s": salt};
   }
 
+  /// Combines any route parameters and builds a [Uri] to represent the final endpoint.
   Uri _buildEndpoint(Route route) {
     Map<String, dynamic> payload = {};
     route.params?.forEach(
@@ -59,6 +74,7 @@ class SubSonic {
     return endpoint;
   }
 
+  /// Requests the data from Subsonic and returns a [SubSonicResponse]
   Future<SubSonicResponse> _request(Route route) async {
     var endpoint = _buildEndpoint(route);
     http.Response response = await _client.get(endpoint);
@@ -90,7 +106,7 @@ class SubSonic {
             case 50:
               throw UnAuthorized(message, code);
             case 60:
-              throw RequiresPermiumn(message, code);
+              throw RequiresPremium(message, code);
             case 70:
               throw DataNotFoundException(message, code);
             default:
@@ -106,6 +122,7 @@ class SubSonic {
     }
   }
 
+  /// Used for endpoints that return binary data
   Future<HttpClientResponse> _requestData(Route route) async {
     var endpoint = _buildEndpoint(route);
     HttpClientResponse data = await HttpClient()
