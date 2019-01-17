@@ -36,7 +36,7 @@ class UnAuthorized extends BaseException {
   UnAuthorized(String message, int code) : super(message, code);
 }
 
-/// 	The trial period for the Subsonic server is over. Please upgrade to Subsonic Premium. Visit subsonic.org for details.
+/// Server does not have a Subsonic Premium subscription
 class RequiresPremium extends BaseException {
   RequiresPremium(String message, int code) : super(message, code);
 }
