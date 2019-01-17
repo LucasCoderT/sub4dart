@@ -23,8 +23,11 @@ class SubSonic {
   /// The url provided in the constructor.
   Uri _path;
 
-  /// The ClearText Password for authentication.
+  /// The MD5 hash for authentication.
   String _password;
+
+  /// The salt used for authentication.
+  String _salt;
 
   /// The Client used to make requests.
   http.Client _client;
@@ -32,39 +35,40 @@ class SubSonic {
   /// Username of the subsonic user to authenticate with.
   String username;
 
-  SubSonic(String path, username, this._password) {
+  SubSonic(String path, this.username, String password) {
     if (!path.startsWith("http")) {
       path = "http://$path";
     }
-    this.username = username;
     this._path = Uri.parse(path);
     this._client = http.Client();
+
     this._baseParams = {
       "u": this.username,
       "v": "1.16.1",
       "c": _clientID,
       "f": "json",
     };
+    _encryptPassword(password);
   }
 
   /// Generates a salt and encrypts the password per subsonic rules for authenticating.
-  Map<String, String> _encryptPassword() {
+  void _encryptPassword(String password) {
     var salt = Salt.generateAsBase64String(6);
-    var bytes = utf8.encode(_password + salt); // data being hashed
+    var bytes = utf8.encode(password + salt); // data being hashed
     var digest = md5.convert(bytes);
-    return {"t": digest.toString(), "s": salt};
+    _password = digest.toString();
+    _salt = salt;
   }
 
   /// Combines any route parameters and builds a [Uri] to represent the final endpoint.
   Uri _buildEndpoint(Route route) {
-    Map<String, dynamic> payload = {};
+    Map<String, dynamic> payload = {"t": _password, "s": _salt};
     route.params?.forEach(
             (key, value) =>
         value != null
             ? payload[key] = value.toString()
             : null);
     payload.addAll(_baseParams);
-    payload.addAll(_encryptPassword());
     var endpoint = Uri(
         scheme: _path.scheme.isEmpty ? "http" : _path.scheme,
         host: _path.host,
@@ -680,10 +684,13 @@ class SubSonic {
 
   Future<SubSonicResponse> changePassword(String password,
       {String username}) async {
-    _password = password;
     var route = Route("/changePassword",
         dataKey: null, payload: {"username": username ?? this.username});
-    return await _request(route);
+    var response = await _request(route);
+    if (response.isOkay) {
+      _encryptPassword(password);
+    }
+    return response;
   }
 
   Future<SubSonicResponse> getBookmarks() async {
