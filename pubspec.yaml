@@ -1,6 +1,6 @@
 name: sub4dart
 description: A Subsonic API wrapper written in Dart.
-version: 1.0.0
+version: 0.0.1
 homepage: https://github.com/LucasCLuk/sub4dart
 author: lucas <lucas@iceteacity.com>
 

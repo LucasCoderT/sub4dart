@@ -1,0 +1,22 @@
+language: dart
+sudo: false
+
+os:
+  - linux
+
+dart:
+  - stable
+#  - dev
+
+script:
+  - dart test/sub4dart_test.dart
+  - dartfmt -n --set-exit-if-changed lib/ test/
+  - dartanalyzer --fatal-warnings --fatal-lints lib/ test/
+
+
+deploy:
+  provider: script
+  on:
+    tags: true
+    skip_cleanup: true
+  script: ./tool/publish.sh
