@@ -1,6 +1,6 @@
 name: sub4dart
 description: Implements the Subsonic API into pure dart for use in other applications.
-version: 0.0.2
+version: 0.0.3
 homepage: https://github.com/LucasCLuk/sub4dart
 author: lucas <lucas@iceteacity.com>
 

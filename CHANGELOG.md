@@ -1,3 +1,6 @@
+## 0.0.3
+- Fixed inheriting issue
+
 ## 0.0.2
 - Renamed SubSonic class to SubSonicClient
 - Created SubSonicAPI abstract class for managing endpoints

@@ -9,13 +9,13 @@ class MockClient extends SubSonicClient {
       : super(path, username, password, timeout: timeout);
 
   @override
-  Future<SubSonicResponse> _request(Route route) async {
-    return SubSonicResponse({"static": "ok"}, null);
+  Future<SubSonicResponse> request(Route route) async {
+    return SubSonicResponse({"status": "ok"}, null);
   }
 
   @override
-  Future<HttpClientResponse> _requestData(Route route) async {
-    // TODO: implement _requestData
+  Future<HttpClientResponse> requestData(Route route) {
+    // TODO: implement requestData
     return null;
   }
 }
