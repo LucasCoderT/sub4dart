@@ -9,9 +9,10 @@ import 'package:password_hash/password_hash.dart';
 import 'package:sub4dart/src/enums.dart';
 import 'package:sub4dart/src/exceptions.dart';
 import 'package:sub4dart/src/models/route.dart';
-import 'package:sub4dart/src/models/subsonic_response.dart'; // for the utf8.encode method
+import 'package:sub4dart/src/models/subsonic_response.dart';
+import 'package:sub4dart/src/subsonic_api.dart'; // for the utf8.encode method
 
-class SubSonic {
+class SubSonicClient implements SubSonicAPI {
   /// Unique Client ID sent with every request.
   final String _clientID = "Sub4Dartv01";
 
@@ -39,7 +40,7 @@ class SubSonic {
   /// Username of the subsonic user to authenticate with.
   String username;
 
-  SubSonic(String path, this.username, String password, {int timeout}) {
+  SubSonicClient(String path, this.username, String password, {int timeout}) {
     if (!path.startsWith("http")) {
       path = "http://$path";
     }
@@ -170,7 +171,8 @@ class SubSonic {
   }
 
   /// Returns an indexed structure of all artists.
-  Future<SubSonicResponse> getIndexes([String musicFolderId, String ifModifiedSince]) async {
+  Future<SubSonicResponse> getIndexes(
+      [String musicFolderId, String ifModifiedSince]) async {
     var route = Route("/getIndexes", dataKey: "indexes", payload: {
       "musicFolderId": musicFolderId,
       "ifModifiedSince": ifModifiedSince
@@ -327,7 +329,8 @@ class SubSonic {
   }
 
   /// Returns starred songs, albums and artists.
-  Future<SubSonicResponse> getStarred({String musicFolderId, bool useId3 = false}) async {
+  Future<SubSonicResponse> getStarred(
+      {String musicFolderId, bool useId3 = false}) async {
     var route = Route(useId3 ? "/getStarred2" : "/getStarred",
         dataKey: useId3 ? "starred2" : "starred",
         payload: {"musicFolderId": musicFolderId});
@@ -464,7 +467,8 @@ class SubSonic {
   }
 
   /// Attaches a star to a song, album or artist.
-  Future<SubSonicResponse> star({String id, String albumId, String artistId}) async {
+  Future<SubSonicResponse> star(
+      {String id, String albumId, String artistId}) async {
     var route = Route("/star",
         dataKey: null,
         payload: {"id": id, "albumId": albumId, "artistId": artistId});
@@ -472,7 +476,8 @@ class SubSonic {
   }
 
   /// Removes the star from a song, album or artist.
-  Future<SubSonicResponse> unstar({String id, String albumId, String artistId}) async {
+  Future<SubSonicResponse> unstar(
+      {String id, String albumId, String artistId}) async {
     var route = Route("/unstar",
         dataKey: null,
         payload: {"id": id, "albumId": albumId, "artistId": artistId});
@@ -536,7 +541,8 @@ class SubSonic {
   /// This method can also be used to return details for only one channel - refer to the id parameter.
   /// A typical use case for this method would be to first retrieve all channels without episodes,
   /// and then retrieve all episodes for the single channel the user selects.
-  Future<SubSonicResponse> getPodcasts({bool includeEpisodes, String id}) async {
+  Future<SubSonicResponse> getPodcasts(
+      {bool includeEpisodes, String id}) async {
     var route = Route("/getPodcasts",
         dataKey: "podcasts",
         payload: {"includeEpisodes": includeEpisodes, "id": id});
