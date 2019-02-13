@@ -6,7 +6,8 @@ void main() {
     SubSonic subSonic;
 
     setUp(() {
-      subSonic = new SubSonic("http://192.168.50.141:4040", "admin", "admin");
+      subSonic =
+      new SubSonic("http://192.168.50.141:4040", "admin", "admin", timeout: 1);
     });
 
     test("Get Ping", () async {
@@ -148,7 +149,7 @@ void main() {
       expect(data.isOkay, isTrue);
     });
 
-    test("get Starred", () async {
+    test("Get Starred", () async {
       var data = await subSonic.getStarred();
       expect(data.isOkay, isTrue);
     });

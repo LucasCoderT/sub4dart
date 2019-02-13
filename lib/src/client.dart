@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert' as convert;
 import 'dart:convert';
 import 'dart:io';
@@ -17,6 +18,9 @@ class SubSonic {
   /// The Base REST API route used.
   final String _baseRoute = "/rest";
 
+  /// The duration to wait for a request to timeout, defaults to 5 seconds.
+  int _timeOut;
+
   /// General parameters sent with every request.
   Map<String, dynamic> _baseParams;
 
@@ -35,12 +39,13 @@ class SubSonic {
   /// Username of the subsonic user to authenticate with.
   String username;
 
-  SubSonic(String path, this.username, String password) {
+  SubSonic(String path, this.username, String password, {int timeout}) {
     if (!path.startsWith("http")) {
       path = "http://$path";
     }
     this._path = Uri.parse(path);
     this._client = http.Client();
+    this._timeOut = timeout ?? 5;
 
     this._baseParams = {
       "u": this.username,
@@ -81,48 +86,53 @@ class SubSonic {
   /// Requests the data from Subsonic and returns a [SubSonicResponse]
   Future<SubSonicResponse> _request(Route route) async {
     var endpoint = _buildEndpoint(route);
-    http.Response response = await _client.get(endpoint);
-    if (response.statusCode == 200) {
-      if (response.headers['content-type'] ==
-          "application/json; charset=UTF-8") {
-        var responseData = convert.jsonDecode(response.body);
-        SubSonicResponse sonicResponse =
-        SubSonicResponse(responseData['subsonic-response'], route.dataKey);
-        if (sonicResponse.isOkay) {
-          return sonicResponse;
-        } else {
-          var errorData = sonicResponse.data['error'];
-          var message = errorData['message'];
-          var code = errorData['code'];
-          switch (code) {
-            case 0:
-              throw BaseException(message, code);
-            case 10:
-              throw MissingRequiredArgument(message, code);
-            case 20:
-              throw ClientOutOfDate(message, code);
-            case 30:
-              throw ServerOutOfDate(message, code);
-            case 40:
-              throw InvalidCredentials(message, code);
-            case 41:
-              throw LDAPNotSupported(message, code);
-            case 50:
-              throw UnAuthorized(message, code);
-            case 60:
-              throw RequiresPremium(message, code);
-            case 70:
-              throw DataNotFoundException(message, code);
-            default:
-              throw Exception(
-                  "Unable to process request: Returned error code ${code} with message: ${message}");
+    try {
+      http.Response response =
+      await _client.get(endpoint).timeout(Duration(seconds: _timeOut));
+      if (response.statusCode == 200) {
+        if (response.headers['content-type'] ==
+            "application/json; charset=UTF-8") {
+          var responseData = convert.jsonDecode(response.body);
+          SubSonicResponse sonicResponse = SubSonicResponse(
+              responseData['subsonic-response'], route.dataKey);
+          if (sonicResponse.isOkay) {
+            return sonicResponse;
+          } else {
+            var errorData = sonicResponse.data['error'];
+            var message = errorData['message'];
+            var code = errorData['code'];
+            switch (code) {
+              case 0:
+                throw BaseException(message, code);
+              case 10:
+                throw MissingRequiredArgument(message, code);
+              case 20:
+                throw ClientOutOfDate(message, code);
+              case 30:
+                throw ServerOutOfDate(message, code);
+              case 40:
+                throw InvalidCredentials(message, code);
+              case 41:
+                throw LDAPNotSupported(message, code);
+              case 50:
+                throw UnAuthorized(message, code);
+              case 60:
+                throw RequiresPremium(message, code);
+              case 70:
+                throw DataNotFoundException(message, code);
+              default:
+                throw Exception(
+                    "Unable to process request: Returned error code ${code} with message: ${message}");
+            }
           }
+        } else {
+          throw Exception("Returned malformed data");
         }
       } else {
-        throw Exception();
+        throw Exception("Unable to parse data");
       }
-    } else {
-      throw Exception("Unable to parse data");
+    } on TimeoutException {
+      throw Exception("Request timed out");
     }
   }
 
@@ -131,6 +141,7 @@ class SubSonic {
     var endpoint = _buildEndpoint(route);
     HttpClientResponse data = await HttpClient()
         .getUrl(endpoint)
+        .timeout(Duration(seconds: _timeOut))
         .then((HttpClientRequest request) => request.close());
     if (data.headers.contentType == ContentType.binary) {
       return data;
@@ -159,8 +170,7 @@ class SubSonic {
   }
 
   /// Returns an indexed structure of all artists.
-  Future<SubSonicResponse> getIndexes(
-      [String musicFolderId, String ifModifiedSince]) async {
+  Future<SubSonicResponse> getIndexes([String musicFolderId, String ifModifiedSince]) async {
     var route = Route("/getIndexes", dataKey: "indexes", payload: {
       "musicFolderId": musicFolderId,
       "ifModifiedSince": ifModifiedSince
@@ -317,8 +327,7 @@ class SubSonic {
   }
 
   /// Returns starred songs, albums and artists.
-  Future<SubSonicResponse> getStarred(
-      {String musicFolderId, bool useId3 = false}) async {
+  Future<SubSonicResponse> getStarred({String musicFolderId, bool useId3 = false}) async {
     var route = Route(useId3 ? "/getStarred2" : "/getStarred",
         dataKey: useId3 ? "starred2" : "starred",
         payload: {"musicFolderId": musicFolderId});
@@ -455,8 +464,7 @@ class SubSonic {
   }
 
   /// Attaches a star to a song, album or artist.
-  Future<SubSonicResponse> star(
-      {String id, String albumId, String artistId}) async {
+  Future<SubSonicResponse> star({String id, String albumId, String artistId}) async {
     var route = Route("/star",
         dataKey: null,
         payload: {"id": id, "albumId": albumId, "artistId": artistId});
@@ -464,8 +472,7 @@ class SubSonic {
   }
 
   /// Removes the star from a song, album or artist.
-  Future<SubSonicResponse> unstar(
-      {String id, String albumId, String artistId}) async {
+  Future<SubSonicResponse> unstar({String id, String albumId, String artistId}) async {
     var route = Route("/unstar",
         dataKey: null,
         payload: {"id": id, "albumId": albumId, "artistId": artistId});
@@ -529,8 +536,7 @@ class SubSonic {
   /// This method can also be used to return details for only one channel - refer to the id parameter.
   /// A typical use case for this method would be to first retrieve all channels without episodes,
   /// and then retrieve all episodes for the single channel the user selects.
-  Future<SubSonicResponse> getPodcasts(
-      {bool includeEpisodes, String id}) async {
+  Future<SubSonicResponse> getPodcasts({bool includeEpisodes, String id}) async {
     var route = Route("/getPodcasts",
         dataKey: "podcasts",
         payload: {"includeEpisodes": includeEpisodes, "id": id});
@@ -568,7 +574,6 @@ class SubSonic {
     Route("/deletePodcastChannel", dataKey: null, payload: {"id": id});
     return await _request(route);
   }
-
 
   /// Deletes a Podcast episode.
   Future<SubSonicResponse> deletePodcastEpisode(String id) async {
