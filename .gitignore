@@ -12,3 +12,4 @@ doc/api/
 # Custom directories
 .idea/*
 analysis_options.yaml
+pubcredentials.json

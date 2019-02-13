@@ -1,22 +1,20 @@
 language: dart
 sudo: false
-
 os:
   - linux
-
 dart:
   - stable
-#  - dev
-
 script:
   - dart test/sub4dart_test.dart
   - dartfmt -n --set-exit-if-changed lib/ test/
   - dartanalyzer --fatal-warnings --fatal-lints lib/ test/
-
-
 deploy:
+  skip_cleanup: true
   provider: script
   on:
     tags: true
-    skip_cleanup: true
-  script: ./tool/publish.sh
+  script: pub publish -f
+before_install:
+  - mkdir ~/.pub-cache
+  - openssl aes-256-cbc -K $encrypted_49acad0d343f_key -iv $encrypted_49acad0d343f_iv
+    -in pubcredentials.json.enc -out ~/.pub-cache/credentials.json -d
