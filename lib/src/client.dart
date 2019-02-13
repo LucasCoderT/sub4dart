@@ -70,10 +70,7 @@ class SubSonicClient implements SubSonicAPI {
   Uri _buildEndpoint(Route route) {
     Map<String, dynamic> payload = {"t": _password, "s": _salt};
     route.params?.forEach(
-            (key, value) =>
-        value != null
-            ? payload[key] = value.toString()
-            : null);
+        (key, value) => value != null ? payload[key] = value.toString() : null);
     payload.addAll(_baseParams);
     var endpoint = Uri(
         scheme: _path.scheme.isEmpty ? "http" : _path.scheme,
@@ -89,7 +86,7 @@ class SubSonicClient implements SubSonicAPI {
     var endpoint = _buildEndpoint(route);
     try {
       http.Response response =
-      await _client.get(endpoint).timeout(Duration(seconds: _timeOut));
+          await _client.get(endpoint).timeout(Duration(seconds: _timeOut));
       if (response.statusCode == 200) {
         if (response.headers['content-type'] ==
             "application/json; charset=UTF-8") {
@@ -183,7 +180,7 @@ class SubSonicClient implements SubSonicAPI {
   /// Returns a listing of all files in a music directory. Typically used to get list of albums for an artist, or list of songs for an album.
   Future<SubSonicResponse> getMusicDirectory(String id) async {
     var route =
-    Route("/getMusicDirectory", dataKey: "directory", payload: {"id": id});
+        Route("/getMusicDirectory", dataKey: "directory", payload: {"id": id});
     return await request(route);
   }
 
@@ -230,7 +227,7 @@ class SubSonicClient implements SubSonicAPI {
   /// Returns details for a video, including information about available audio tracks, subtitles (captions) and conversions.
   Future<SubSonicResponse> getVideoInfo(String id) async {
     var route =
-    Route("/getVideoInfo", dataKey: "videoInfo", payload: {"id": id});
+        Route("/getVideoInfo", dataKey: "videoInfo", payload: {"id": id});
     return await request(route);
   }
 
@@ -267,19 +264,19 @@ class SubSonicClient implements SubSonicAPI {
   /// Returns top songs for the given artist, using data from last.fm.
   Future<SubSonicResponse> getTopSongs(String artist, {int count = 50}) async {
     var route =
-    Route("/getTopSongs", dataKey: "topSongs", payload: {"artist": artist});
+        Route("/getTopSongs", dataKey: "topSongs", payload: {"artist": artist});
     return await request(route);
   }
 
   /// Returns a list of random, newest, highest rated etc. albums. Similar to the album lists on the home page of the Subsonic web interface.
   Future<SubSonicResponse> getAlbumList(SearchType type,
       {int size,
-        int offset,
-        DateTime fromYear,
-        DateTime toYear,
-        String genre,
-        String musicFolderId,
-        bool useId3 = false}) async {
+      int offset,
+      DateTime fromYear,
+      DateTime toYear,
+      String genre,
+      String musicFolderId,
+      bool useId3 = false}) async {
     var route = Route(useId3 ? "/getAlbumList2" : "/getAlbumList",
         dataKey: useId3 ? "albumList2" : "albumList",
         payload: {
@@ -295,11 +292,12 @@ class SubSonicClient implements SubSonicAPI {
   }
 
   /// Returns random songs matching the given criteria.
-  Future<SubSonicResponse> getRandomSongs({int size,
-    String genre,
-    DateTime fromYear,
-    DateTime toYear,
-    String musicFolderId}) async {
+  Future<SubSonicResponse> getRandomSongs(
+      {int size,
+      String genre,
+      DateTime fromYear,
+      DateTime toYear,
+      String musicFolderId}) async {
     var route = Route("/getRandomSongs", dataKey: "randomSongs", payload: {
       "size": size,
       "genre": genre,
@@ -340,13 +338,13 @@ class SubSonicClient implements SubSonicAPI {
   /// Returns a listing of files matching the given search criteria. Supports paging through the result.
   Future<SubSonicResponse> search(String query,
       {int artistCount,
-        int artistOffset,
-        int albumCount,
-        int albumOffset,
-        int songCount,
-        int songOffset,
-        String musicFolderId,
-        bool useId3 = false}) async {
+      int artistOffset,
+      int albumCount,
+      int albumOffset,
+      int songCount,
+      int songOffset,
+      String musicFolderId,
+      bool useId3 = false}) async {
     var route = Route("/search${useId3 ? '3' : '2'}",
         dataKey: "searchResult${useId3 ? '3' : '2'}",
         payload: {
@@ -376,8 +374,8 @@ class SubSonicClient implements SubSonicAPI {
   }
 
   /// Creates a playlist
-  Future<SubSonicResponse> createPlaylist(String name,
-      List<String> songs) async {
+  Future<SubSonicResponse> createPlaylist(
+      String name, List<String> songs) async {
     var route = Route("/createPlaylist",
         dataKey: "playlist", payload: {"name": name, "songId": songs});
     return await request(route);
@@ -386,10 +384,10 @@ class SubSonicClient implements SubSonicAPI {
   /// Updates a playlist. Only the owner of a playlist is allowed to update it.
   Future<SubSonicResponse> updatePlaylist(String id,
       {String name,
-        String comment,
-        bool public,
-        List<String> songstoAdd,
-        List<int> songIndexesToRemove}) async {
+      String comment,
+      bool public,
+      List<String> songstoAdd,
+      List<int> songIndexesToRemove}) async {
     var route = Route("/updatePlaylist", dataKey: null, payload: {
       "playlistId": id,
       "name": name,
@@ -404,18 +402,18 @@ class SubSonicClient implements SubSonicAPI {
   /// Deletes a saved playlist.
   Future<SubSonicResponse> deletePlaylist(String playlistId) async {
     var route =
-    Route("/deletePlaylist", dataKey: null, payload: {"id": playlistId});
+        Route("/deletePlaylist", dataKey: null, payload: {"id": playlistId});
     return await request(route);
   }
 
   /// Streams a given media file.
   Future<HttpClientResponse> stream(String id,
       {String maxBitRate,
-        String format,
-        int timeOffset,
-        String resolution,
-        bool estimateContentLength = false,
-        bool converted = false}) async {
+      String format,
+      int timeOffset,
+      String resolution,
+      bool estimateContentLength = false,
+      bool converted = false}) async {
     var route = Route("/stream", dataKey: null, payload: {
       "id": id,
       "maxBitRate": maxBitRate,
@@ -448,7 +446,7 @@ class SubSonicClient implements SubSonicAPI {
   /// Returns a cover art image.
   Future<HttpClientResponse> getCoverArt(String id, {String size}) async {
     var route =
-    Route("/getCoverArt", dataKey: null, payload: {"id": id, "size": size});
+        Route("/getCoverArt", dataKey: null, payload: {"id": id, "size": size});
     return requestData(route);
   }
 
@@ -462,7 +460,7 @@ class SubSonicClient implements SubSonicAPI {
   /// Returns the avatar (personal image) for a user.
   Future<HttpClientResponse> getAvatar(String username) async {
     var route =
-    Route("/getAvatar", dataKey: null, payload: {"username": username});
+        Route("/getAvatar", dataKey: null, payload: {"username": username});
     return requestData(route);
   }
 
@@ -568,7 +566,7 @@ class SubSonicClient implements SubSonicAPI {
   /// administration (see Settings > Users > User is allowed to administrate Podcasts).
   Future<SubSonicResponse> createPodcastChannel(String url) async {
     var route =
-    Route("/createPodcastChannel", dataKey: null, payload: {"url": url});
+        Route("/createPodcastChannel", dataKey: null, payload: {"url": url});
     return await request(route);
   }
 
@@ -577,14 +575,14 @@ class SubSonicClient implements SubSonicAPI {
   /// administration (see Settings > Users > User is allowed to administrate Podcasts).
   Future<SubSonicResponse> deletePodcastChannel(String id) async {
     var route =
-    Route("/deletePodcastChannel", dataKey: null, payload: {"id": id});
+        Route("/deletePodcastChannel", dataKey: null, payload: {"id": id});
     return await request(route);
   }
 
   /// Deletes a Podcast episode.
   Future<SubSonicResponse> deletePodcastEpisode(String id) async {
     var route =
-    Route("/deletePodcastEpisode", dataKey: null, payload: {"id": id});
+        Route("/deletePodcastEpisode", dataKey: null, payload: {"id": id});
     return await request(route);
   }
 
@@ -593,7 +591,7 @@ class SubSonicClient implements SubSonicAPI {
   /// administration (see Settings > Users > User is allowed to administrate Podcasts).
   Future<SubSonicResponse> downloadPodcastEpisode(String id) async {
     var route =
-    Route("/downloadPodcastEpisode", dataKey: null, payload: {"id": id});
+        Route("/downloadPodcastEpisode", dataKey: null, payload: {"id": id});
     return await request(route);
   }
 
@@ -602,7 +600,7 @@ class SubSonicClient implements SubSonicAPI {
       {int index, int offset, String id, int gain}) async {
     var route = Route("/jukeboxControl",
         dataKey:
-        action == JukeBoxAction.get ? "jukeboxPlaylist" : "jukeboxStatus",
+            action == JukeBoxAction.get ? "jukeboxPlaylist" : "jukeboxStatus",
         payload: {
           "action": jukeBoxActionToString(action),
           "index": index,
@@ -623,8 +621,8 @@ class SubSonicClient implements SubSonicAPI {
 
   /// Adds a new internet radio station.
   /// Only users with admin privileges are allowed to call this method.
-  Future<SubSonicResponse> createInternetRadioStation(String streamUrl,
-      String name,
+  Future<SubSonicResponse> createInternetRadioStation(
+      String streamUrl, String name,
       {String homepageUrl}) async {
     var route = Route("/createInternetRadioStation", dataKey: null, payload: {
       "streamUrl": streamUrl,
@@ -636,8 +634,8 @@ class SubSonicClient implements SubSonicAPI {
 
   /// Updates an existing internet radio station.
   /// Only users with admin privileges are allowed to call this method.
-  Future<SubSonicResponse> updateInternetRadioStation(String id,
-      String streamUrl, String name,
+  Future<SubSonicResponse> updateInternetRadioStation(
+      String id, String streamUrl, String name,
       {String homepageUrl}) async {
     var route = Route("/updateInternetRadioStation", dataKey: null, payload: {
       "id": id,
@@ -667,7 +665,7 @@ class SubSonicClient implements SubSonicAPI {
   /// Adds a message to the chat log.
   Future<SubSonicResponse> addChatMessage(String message) async {
     var route =
-    Route("/addChatMessage", dataKey: null, payload: {"message": message});
+        Route("/addChatMessage", dataKey: null, payload: {"message": message});
     return await request(route);
   }
 
@@ -676,7 +674,7 @@ class SubSonicClient implements SubSonicAPI {
   /// Can be used to enable/disable certain features in the client, such as jukebox control.
   Future<SubSonicResponse> getUser(String username) async {
     var route =
-    Route("/getUser", dataKey: "user", payload: {"username": username});
+        Route("/getUser", dataKey: "user", payload: {"username": username});
     return await request(route);
   }
 
@@ -689,22 +687,22 @@ class SubSonicClient implements SubSonicAPI {
   }
 
   /// Creates a new Subsonic user,
-  Future<SubSonicResponse> createUser(String username, String password,
-      String email,
+  Future<SubSonicResponse> createUser(
+      String username, String password, String email,
       {bool ldapAuthenticated = false,
-        bool adminRole = false,
-        bool settingsRole = true,
-        bool streamRole = true,
-        bool jukeboxRole = false,
-        bool downloadRole = false,
-        bool uploadRole = false,
-        bool playlistRole = false,
-        bool coverArtRole = false,
-        bool commentRole = false,
-        bool podcastRole = false,
-        bool shareRole = false,
-        bool videoConversionRole = false,
-        List<String> musicFolders}) async {
+      bool adminRole = false,
+      bool settingsRole = true,
+      bool streamRole = true,
+      bool jukeboxRole = false,
+      bool downloadRole = false,
+      bool uploadRole = false,
+      bool playlistRole = false,
+      bool coverArtRole = false,
+      bool commentRole = false,
+      bool podcastRole = false,
+      bool shareRole = false,
+      bool videoConversionRole = false,
+      List<String> musicFolders}) async {
     var route = Route("/createUser", dataKey: null, payload: {
       "username": username,
       "password": password,
@@ -728,23 +726,23 @@ class SubSonicClient implements SubSonicAPI {
   }
 
   /// Modifies an existing Subsonic user
-  Future<SubSonicResponse> updateUser(String username, String password,
-      String email,
+  Future<SubSonicResponse> updateUser(
+      String username, String password, String email,
       {bool ldapAuthenticated = false,
-        bool adminRole = false,
-        bool settingsRole = true,
-        bool streamRole = true,
-        bool jukeboxRole = false,
-        bool downloadRole = false,
-        bool uploadRole = false,
-        bool playlistRole = false,
-        bool coverArtRole = false,
-        bool commentRole = false,
-        bool podcastRole = false,
-        bool shareRole = false,
-        bool videoConversionRole = false,
-        List<String> musicFolders,
-        int maxBitRate}) async {
+      bool adminRole = false,
+      bool settingsRole = true,
+      bool streamRole = true,
+      bool jukeboxRole = false,
+      bool downloadRole = false,
+      bool uploadRole = false,
+      bool playlistRole = false,
+      bool coverArtRole = false,
+      bool commentRole = false,
+      bool podcastRole = false,
+      bool shareRole = false,
+      bool videoConversionRole = false,
+      List<String> musicFolders,
+      int maxBitRate}) async {
     var route = Route("/updateUser", dataKey: null, payload: {
       "username": username,
       "password": password,
@@ -771,7 +769,7 @@ class SubSonicClient implements SubSonicAPI {
   /// Deletes an existing Subsonic user
   Future<SubSonicResponse> deleteUser(String username) async {
     var route =
-    Route("/deleteUser", dataKey: null, payload: {"username": username});
+        Route("/deleteUser", dataKey: null, payload: {"username": username});
     return await request(route);
   }
 
