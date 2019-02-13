@@ -1,13 +1,15 @@
 import 'package:sub4dart/sub4dart.dart';
 import 'package:test/test.dart';
 
+import 'models/mock_client.dart';
+
 void main() {
   group('REST Tests', () {
-    SubSonic subSonic;
+    SubSonicClient subSonic;
 
     setUp(() {
-      subSonic =
-      new SubSonic("http://192.168.50.141:4040", "admin", "admin", timeout: 1);
+      subSonic = new MockClient("http://192.168.50.141:4040", "admin", "admin",
+          timeout: 1);
     });
 
     test("Get Ping", () async {
