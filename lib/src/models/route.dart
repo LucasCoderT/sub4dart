@@ -6,7 +6,7 @@ class Route implements EndPoint {
   var dataKey;
 
   Route(String endpoint,
-      {String dataKey = null, Map<String, dynamic> payload = const {}}) {
+      {String dataKey, Map<String, dynamic> payload = const {}}) {
     this.endpoint = endpoint;
     this.params = payload;
     this.dataKey = dataKey;
