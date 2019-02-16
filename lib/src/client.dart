@@ -88,8 +88,7 @@ class SubSonicClient implements SubSonicAPI {
       http.Response response =
           await _client.get(endpoint).timeout(Duration(seconds: _timeOut));
       if (response.statusCode == 200) {
-        if (response.headers['content-type'] ==
-            "application/json; charset=UTF-8") {
+        if (response.headers['content-type'].contains("application/json")) {
           var responseData = convert.jsonDecode(response.body);
           SubSonicResponse sonicResponse = SubSonicResponse(
               responseData['subsonic-response'], route.dataKey);
@@ -127,7 +126,8 @@ class SubSonicClient implements SubSonicAPI {
           throw Exception("Returned malformed data");
         }
       } else {
-        throw Exception("Unable to parse data");
+        throw Exception(
+            "Request returned ${response.statusCode} - ${response.body}");
       }
     } on TimeoutException {
       throw Exception("Request timed out");
