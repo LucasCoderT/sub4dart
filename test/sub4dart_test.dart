@@ -9,10 +9,6 @@ void main() {
       subSonic = new SubSonicClient("https://test.com", "lucas", "password");
     });
 
-    test("Change Credentials ", () async {
-      subSonic.changeSettings(username: "lucas", host: "testhost");
-    });
-
     test("Get Ping", () async {
       var data = await subSonic.getPing();
       expect(data.isOkay, isTrue);
@@ -168,6 +164,10 @@ void main() {
       expect(data.data, isNotEmpty);
     });
 
-    tearDown(() => subSonic.dispose());
+    test("Change Credentials ", () async {
+      subSonic.changeSettings(username: "lucas", host: "testhost");
+      var response = await subSonic.getPing();
+      expect(response.isOkay, isFalse);
+    });
   });
 }

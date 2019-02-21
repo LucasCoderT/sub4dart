@@ -34,14 +34,10 @@ class SubSonicClient implements SubSonicAPI {
   /// The salt used for authentication.
   String _salt;
 
-  /// The Client used to make requests.
-  http.Client _client;
-
   /// Username of the subsonic user to authenticate with.
   String _username;
 
   SubSonicClient(String path, this._username, String password, {int timeout}) {
-    _client = http.Client();
     _baseParams = {
       "u": this._username,
       "v": "1.16.1",
@@ -90,10 +86,11 @@ class SubSonicClient implements SubSonicAPI {
 
   /// Requests the data from Subsonic and returns a [SubSonicResponse]
   Future<SubSonicResponse> request(Route route) async {
+    final http.Client client = http.Client();
     final endpoint = _buildEndpoint(route);
     try {
       final http.Response response =
-          await _client.get(endpoint).timeout(Duration(seconds: _timeOut));
+      await client.get(endpoint).timeout(Duration(seconds: _timeOut));
       if (response.statusCode == 200) {
         if (response.headers['content-type'].contains("application/json")) {
           final responseData = convert.jsonDecode(response.body);
@@ -138,6 +135,8 @@ class SubSonicClient implements SubSonicAPI {
       }
     } on TimeoutException {
       throw Exception("Request timed out");
+    } finally {
+      client.close();
     }
   }
 
@@ -854,9 +853,5 @@ class SubSonicClient implements SubSonicAPI {
   Future<SubSonicResponse> startScan() async {
     final route = Route("/startScan", dataKey: "scanStatus", payload: null);
     return await request(route);
-  }
-
-  void dispose() {
-    _client.close();
   }
 }
