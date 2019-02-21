@@ -90,7 +90,7 @@ class SubSonicClient implements SubSonicAPI {
     final endpoint = _buildEndpoint(route);
     try {
       final http.Response response =
-      await client.get(endpoint).timeout(Duration(seconds: _timeOut));
+          await client.get(endpoint).timeout(Duration(seconds: _timeOut));
       if (response.statusCode == 200) {
         if (response.headers['content-type'].contains("application/json")) {
           final responseData = convert.jsonDecode(response.body);
@@ -141,7 +141,7 @@ class SubSonicClient implements SubSonicAPI {
   }
 
   void changeSettings(
-      {String username, String host, String password, int timeout}) =>
+          {String username, String host, String password, int timeout}) =>
       _init(
           username: username, path: host, password: password, timeout: timeout);
 
@@ -381,7 +381,7 @@ class SubSonicClient implements SubSonicAPI {
   /// Returns a listing of files in a saved playlist.
   Future<SubSonicResponse> getPlayList(String id) async {
     final route =
-    Route("/getPlayList", dataKey: "playlist", payload: {"id": id});
+        Route("/getPlayList", dataKey: "playlist", payload: {"id": id});
     return await request(route);
   }
 

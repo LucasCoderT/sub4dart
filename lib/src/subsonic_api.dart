@@ -11,7 +11,8 @@ abstract class SubSonicAPI {
 
   Future<SubSonicResponse> getMusicFolders();
 
-  Future<SubSonicResponse> getIndexes([String musicFolderId, String ifModifiedSince]);
+  Future<SubSonicResponse> getIndexes(
+      [String musicFolderId, String ifModifiedSince]);
 
   Future<SubSonicResponse> getMusicDirectory(String id);
 
@@ -41,35 +42,37 @@ abstract class SubSonicAPI {
 
   Future<SubSonicResponse> getAlbumList(SearchType type,
       {int size,
-        int offset,
-        DateTime fromYear,
-        DateTime toYear,
-        String genre,
-        String musicFolderId,
-        bool useId3 = false});
+      int offset,
+      DateTime fromYear,
+      DateTime toYear,
+      String genre,
+      String musicFolderId,
+      bool useId3 = false});
 
-  Future<SubSonicResponse> getRandomSongs({int size,
-    String genre,
-    DateTime fromYear,
-    DateTime toYear,
-    String musicFolderId});
+  Future<SubSonicResponse> getRandomSongs(
+      {int size,
+      String genre,
+      DateTime fromYear,
+      DateTime toYear,
+      String musicFolderId});
 
   Future<SubSonicResponse> getSongsByGenre(String genre,
       {int count = 10, int offset = 0, String musicFolderId});
 
   Future<SubSonicResponse> getNowPlaying();
 
-  Future<SubSonicResponse> getStarred({String musicFolderId, bool useId3 = false});
+  Future<SubSonicResponse> getStarred(
+      {String musicFolderId, bool useId3 = false});
 
   Future<SubSonicResponse> search(String query,
       {int artistCount,
-        int artistOffset,
-        int albumCount,
-        int albumOffset,
-        int songCount,
-        int songOffset,
-        String musicFolderId,
-        bool useId3 = false});
+      int artistOffset,
+      int albumCount,
+      int albumOffset,
+      int songCount,
+      int songOffset,
+      String musicFolderId,
+      bool useId3 = false});
 
   Future<SubSonicResponse> getPlaylists({String username});
 
@@ -79,20 +82,20 @@ abstract class SubSonicAPI {
 
   Future<SubSonicResponse> updatePlaylist(String id,
       {String name,
-        String comment,
-        bool public,
-        List<String> songstoAdd,
-        List<int> songIndexesToRemove});
+      String comment,
+      bool public,
+      List<String> songstoAdd,
+      List<int> songIndexesToRemove});
 
   Future<SubSonicResponse> deletePlaylist(String playlistId);
 
   Future<HttpClientResponse> stream(String id,
       {String maxBitRate,
-        String format,
-        int timeOffset,
-        String resolution,
-        bool estimateContentLength = false,
-        bool converted = false});
+      String format,
+      int timeOffset,
+      String resolution,
+      bool estimateContentLength = false,
+      bool converted = false});
 
   Future<HttpClientResponse> download(String id);
 
@@ -144,10 +147,12 @@ abstract class SubSonicAPI {
 
   Future<SubSonicResponse> getInternetRadioStations();
 
-  Future<SubSonicResponse> createInternetRadioStation(String streamUrl, String name,
+  Future<SubSonicResponse> createInternetRadioStation(
+      String streamUrl, String name,
       {String homepageUrl});
 
-  Future<SubSonicResponse> updateInternetRadioStation(String id, String streamUrl, String name,
+  Future<SubSonicResponse> updateInternetRadioStation(
+      String id, String streamUrl, String name,
       {String homepageUrl});
 
   Future<SubSonicResponse> deleteInternetRadioStation(String id);
@@ -160,38 +165,40 @@ abstract class SubSonicAPI {
 
   Future<SubSonicResponse> getUsers();
 
-  Future<SubSonicResponse> createUser(String username, String password, String email,
+  Future<SubSonicResponse> createUser(
+      String username, String password, String email,
       {bool ldapAuthenticated = false,
-        bool adminRole = false,
-        bool settingsRole = true,
-        bool streamRole = true,
-        bool jukeboxRole = false,
-        bool downloadRole = false,
-        bool uploadRole = false,
-        bool playlistRole = false,
-        bool coverArtRole = false,
-        bool commentRole = false,
-        bool podcastRole = false,
-        bool shareRole = false,
-        bool videoConversionRole = false,
-        List<String> musicFolders});
+      bool adminRole = false,
+      bool settingsRole = true,
+      bool streamRole = true,
+      bool jukeboxRole = false,
+      bool downloadRole = false,
+      bool uploadRole = false,
+      bool playlistRole = false,
+      bool coverArtRole = false,
+      bool commentRole = false,
+      bool podcastRole = false,
+      bool shareRole = false,
+      bool videoConversionRole = false,
+      List<String> musicFolders});
 
-  Future<SubSonicResponse> updateUser(String username, String password, String email,
+  Future<SubSonicResponse> updateUser(
+      String username, String password, String email,
       {bool ldapAuthenticated = false,
-        bool adminRole = false,
-        bool settingsRole = true,
-        bool streamRole = true,
-        bool jukeboxRole = false,
-        bool downloadRole = false,
-        bool uploadRole = false,
-        bool playlistRole = false,
-        bool coverArtRole = false,
-        bool commentRole = false,
-        bool podcastRole = false,
-        bool shareRole = false,
-        bool videoConversionRole = false,
-        List<String> musicFolders,
-        int maxBitRate});
+      bool adminRole = false,
+      bool settingsRole = true,
+      bool streamRole = true,
+      bool jukeboxRole = false,
+      bool downloadRole = false,
+      bool uploadRole = false,
+      bool playlistRole = false,
+      bool coverArtRole = false,
+      bool commentRole = false,
+      bool podcastRole = false,
+      bool shareRole = false,
+      bool videoConversionRole = false,
+      List<String> musicFolders,
+      int maxBitRate});
 
   Future<SubSonicResponse> deleteUser(String username);
 
