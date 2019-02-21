@@ -168,13 +168,15 @@ void main() {
     });
 
     test("Change Credentials ", () async {
-      final client = SubSonicClient("http://192.168.50.142:4040", "lucas", "password");
-      client.changeSettings(username: "lucas", host: "http://192.168.50.142:4040");
+      final client =
+          SubSonicClient("http://192.168.50.142:4040", "lucas", "password");
+      client.changeSettings(
+          username: "lucas", host: "http://192.168.50.142:4040");
       try {
         var response = await client.getPing();
         expect(response.isOkay, isFalse);
       } catch (e) {
-        expect(e,isException);
+        expect(e, isException);
       }
     });
   });
