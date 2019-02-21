@@ -1,15 +1,16 @@
 import 'package:sub4dart/sub4dart.dart';
 import 'package:test/test.dart';
 
-import 'models/mock_client.dart';
-
 void main() {
-  group('REST Tests', () {
+  group("REST Tests", () {
     SubSonicClient subSonic;
 
-    setUp(() {
-      subSonic = new MockClient("http://192.168.50.141:4040", "admin", "admin",
-          timeout: 1);
+    setUpAll(() {
+      subSonic = new SubSonicClient("https://test.com", "lucas", "password");
+    });
+
+    test("Change Credentials ", () async {
+      subSonic.changeSettings(username: "lucas", host: "testhost");
     });
 
     test("Get Ping", () async {
@@ -164,6 +165,7 @@ void main() {
     test("Get Playlists", () async {
       var data = await subSonic.getPlaylists();
       expect(data.isOkay, isTrue);
+      expect(data.data, isNotEmpty);
     });
 
     tearDown(() => subSonic.dispose());
