@@ -1,3 +1,6 @@
+## 0.0.5
+- added client.changeSettings
+
 ## 0.0.3
 - Fixed inheriting issue
 
